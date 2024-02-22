@@ -1,0 +1,94 @@
+///////////////////////////////////////////////////////////////////////////
+// emu_decalpaint.sha
+///////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2003 Bugbear Entertainment ltd. 
+// All Rights Reserved.
+// 
+// Created on 13-Apr-03 10:14:35 PM
+// 
+// Authors: Tatu Blomberg (tatu@bugbear.fi)
+///////////////////////////////////////////////////////////////////////////
+Texture Tex0;
+Texture Tex1;
+
+const string inputStreamFormat = "PosTex2";
+
+vertexshader vSdr = 
+	decl
+	{
+		stream 0;
+		float    v0[3];  // Position
+		float    v3[2];  // Tex coord 0
+		float    v4[2];  // Tex coord 1
+	}
+	asm
+	{
+        ; Constants:
+        ;  0..3 - Composite World-View-Projection Matrix
+		;  9 - Clip plane 0
+		; 10 - Clip plane 1...
+
+		vs.1.1
+		
+		dcl_position	v0
+		dcl_texcoord0	v3		
+		dcl_texcoord1	v4	
+		
+		m4x4	oPos, v0, c0
+		mov		oT0.xy, v3.xy
+		mov		oT1.xy, v4.xy
+	};
+
+Technique DualTexture
+{
+    Pass P0
+    {        
+		Zbias = 2;
+		Texture[0] = <Tex0>;
+		Texture[1] = <Tex1>;
+		
+		VertexShader = <vSdr>;
+
+		ColorArg1[0] = Texture;		//default
+		ColorOp[0] = SelectArg1;
+
+		AlphaArg1[0] = Texture;
+		AlphaOp[0] = SelectArg1;
+
+		ColorArg1[1] = Texture;		//default
+		ColorOp[1] = Modulate;
+		ColorArg2[1] = Current;		//default
+
+		AlphaArg1[1] = Texture;		//default
+		AlphaOp[1] = Modulate;
+		AlphaArg2[1] = Current;		//default
+
+		ColorOp[2] = Disable;
+		AlphaOp[2] = Disable;
+	}
+}
+
+Technique SingleTexture
+{
+    Pass P0
+    {        
+		Zbias = 2;
+		Texture[0] = <Tex0>;
+
+		VertexShader = <vSdr>;
+
+		ColorArg1[0] = Texture;		//default
+		ColorOp[0] = SelectArg1;
+
+		AlphaArg1[0] = Texture;
+		AlphaOp[0] = SelectArg1;
+
+		ColorOp[1] = Disable;
+		AlphaOp[1] = Disable;
+
+	}
+}
+
+
+
+

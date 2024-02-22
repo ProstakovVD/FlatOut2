@@ -1,0 +1,49 @@
+///////////////////////////////////////////////////////////////////////////
+// emu_rendertarget_shadow.sha
+///////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2003 Bugbear Entertainment ltd. 
+// All Rights Reserved.
+// 
+// Created on 13-Apr-03 10:27:43 PM
+// 
+// Authors: Tatu Blomberg (tatu@bugbear.fi)
+///////////////////////////////////////////////////////////////////////////
+
+const string inputStreamFormat = "Pos";
+
+vertexshader vSdr = 
+	decl
+	{
+		stream 0;
+		float    v0[3];  // Position
+	}
+	asm
+	{
+        ; Constants:
+        ;  0..3 - Composite World-View-Projection Matrix
+		vs.1.1
+		
+		dcl_position	v0
+		
+		m4x4	oPos, v0, c0
+		mov		oD0, c95
+	};
+
+
+Technique T0
+{
+    Pass P0
+    {        
+		VertexShader = <vSdr>;
+		VertexShaderConstantF[95] = float4( 0.75f, 0.75f, 0.75f, 0.75f );		
+
+		ColorArg1[0] = Diffuse;
+		ColorOp[0] = SelectArg1;
+
+		AlphaArg1[0] = Diffuse;
+		AlphaOp[0] = SelectArg1;
+
+		ColorOp[1] = Disable;
+		AlphaOp[1] = Disable;
+	}
+}

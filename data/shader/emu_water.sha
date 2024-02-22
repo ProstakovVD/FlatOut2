@@ -1,0 +1,58 @@
+///////////////////////////////////////////////////////////////////////////
+// emu_water.sha
+///////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2004 Bugbear Entertainment ltd. 
+// All Rights Reserved.
+// 
+// Created on 28.9.2004 15:48:36
+// 
+// Authors: Tatu Blomberg (tatu@bugbear.fi)
+///////////////////////////////////////////////////////////////////////////
+Texture	Tex0;
+
+const string inputStreamFormat = "PosColor";
+
+vertexshader vSdr =
+	asm
+	{
+        ; Constants:
+        ;  0..3 - Composite World-View-Projection Matrix
+		vs.1.1
+		
+		dcl_position	v0
+		dcl_color		v2
+		
+		m4x4	oPos, v0, c0
+		mul		oD0, v2, c95
+		
+		// animated texture coordinate
+		mov		r0, c64
+		mul		r0, r0, c94			; not normal scale
+		mul		r1.zw, r0.zw, c14		
+		mad		oT0.xy, v0.xz, r0.xy, r1.zw		
+	};
+		
+Technique T0
+{
+    Pass P0
+    {           
+		Texture[0] = <Tex0>;
+		
+		VertexShaderConstantF[94] = float4( 2.0f, 2.0f, 2.0f, 2.0f );	
+		VertexShaderConstantF[95] = float4( 0.0f, 0.4f, 0.4f, 0.5f );	
+    
+		VertexShader = <vSdr>;
+		
+		ColorArg1[0] = Texture;
+		ColorOp[0] = Modulate;
+		ColorArg2[0] = Diffuse;
+
+		AlphaArg1[0] = Texture;
+		AlphaOp[0] = Modulate;
+		AlphaArg2[0] = Diffuse;
+
+		ColorOp[1] = Disable;
+		AlphaOp[1] = Disable;		
+
+	}
+}				

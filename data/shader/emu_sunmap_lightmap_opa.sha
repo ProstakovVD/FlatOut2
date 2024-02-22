@@ -1,0 +1,60 @@
+///////////////////////////////////////////////////////////////////////////
+// emu_sunmap_lightmap_opa.sha
+///////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2003 Bugbear Entertainment ltd. 
+// All Rights Reserved.
+// 
+// Created on 13-Apr-03 11:43:02 PM
+// 
+// Authors: Tatu Blomberg (tatu@bugbear.fi)
+///////////////////////////////////////////////////////////////////////////
+// Lightmapped
+
+const string inputStreamFormat = "PosTex2";
+
+vertexshader vSdr = 
+	decl
+	{
+		stream 0;
+		float	v0[3];  // Position
+		float	v3[2];  // Tex coord 0
+		float	v4[2];  // Tex coord 0
+	}
+	asm
+	{
+        ; Constants:
+        ;  0..3 - Composite World-View-Projection Matrix
+		vs.1.1
+		
+		dcl_position	v0
+		dcl_texcoord0	v3
+		dcl_texcoord1	v4
+		
+		m4x4	oPos, v0, c0
+
+	};
+	
+
+
+
+Technique T0
+{
+    Pass P0
+    {
+		VertexShader = <vSdr>;
+
+		TextureFactor = 0x00000000;
+		ColorArg1[0] = TFactor;
+		ColorOp[0] = SelectArg1;
+//		ColorArg2[0] = Diffuse;
+
+		AlphaArg1[0] = TFactor;
+		AlphaOp[0] = SelectArg1;
+//		AlphaArg2[0] = Diffuse;
+
+//		ColorOp[1] = Disable;
+//		AlphaOp[1] = Disable;
+
+	}
+}
+
